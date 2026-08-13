@@ -1,0 +1,6 @@
+version: 1
+checks:
+  cask:
+    run: ruby --disable-gems -c Casks/reachpad.rb && ruby --disable-gems -c scripts/update-reachpad.rb && ruby --disable-gems scripts/update-reachpad.rb --check
+    required_for_publish: true
+    watch: true

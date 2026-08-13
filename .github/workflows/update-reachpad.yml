@@ -1,0 +1,44 @@
+name: Update Reachpad cask
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-reachpad-cask
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read the latest Reachpad release
+        id: update
+        run: |
+          ruby scripts/update-reachpad.rb
+          if test -n "$(git status --porcelain)"; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install Rust
+        if: steps.update.outputs.changed == 'true'
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Greentree
+        if: steps.update.outputs.changed == 'true'
+        run: cargo install --git https://github.com/Reachpad/greentree --rev af7e00c2984a3f6cf5351bfd2948312e3c39f97a --locked
+
+      - name: Verify and publish the updated cask
+        if: steps.update.outputs.changed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          version=$(ruby -ne 'puts $1 if $_ =~ /^  version "([^"]+)"$/' Casks/reachpad.rb)
+          git config user.name "reachpad-release-bot"
+          git config user.email "release-bot@reachpad.dev"
+          greentree gate --json --push -m "Update Reachpad to ${version}"
