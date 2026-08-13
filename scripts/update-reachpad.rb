@@ -6,7 +6,7 @@ require "net/http"
 require "uri"
 
 RELEASE_API = "https://api.github.com/repos/Reachpad/reachpad-cli/releases/latest"
-CASK_PATH = File.expand_path("../Casks/reachpad.rb", __dir__)
+FORMULA_PATH = File.expand_path("../Formula/reachpad.rb", __dir__)
 
 def fetch(url, redirects = 5)
   raise "too many redirects while fetching #{url}" if redirects.negative?
@@ -40,9 +40,16 @@ end
 
 def replace_once(contents, pattern)
   count = contents.scan(pattern).length
-  raise "expected one cask match for #{pattern.inspect}, found #{count}" unless count == 1
+  raise "expected one formula match for #{pattern.inspect}, found #{count}" unless count == 1
 
   contents.sub(pattern) { yield(Regexp.last_match) }
+end
+
+# Each checksum is anchored to the release filename on the url line directly
+# above it, so a sha can never be written under the wrong platform no matter
+# how the formula's blocks are reordered.
+def sha_after(filename)
+  /(#{Regexp.escape(filename)}"\n\s*sha256 ")[0-9a-f]{64}(")/
 end
 
 release = JSON.parse(fetch(RELEASE_API))
@@ -64,25 +71,21 @@ required.each_value do |filename|
   raise "#{tag} SHA256SUMS has no #{filename}" unless checksums.key?(filename)
 end
 
-original = File.read(CASK_PATH)
+original = File.read(FORMULA_PATH)
 updated = replace_once(original, /^  version "[^"]+"$/) { %(  version "#{version}") }
-updated = replace_once(updated, /(on_macos do\n    sha256 ")[0-9a-f]{64}(")/) do |found|
-  "#{found[1]}#{checksums.fetch(required[:macos_arm64])}#{found[2]}"
-end
-updated = replace_once(updated, /(sha256 arm64_linux:\s+")[0-9a-f]{64}(")/) do |found|
-  "#{found[1]}#{checksums.fetch(required[:linux_arm64])}#{found[2]}"
-end
-updated = replace_once(updated, /(x86_64_linux: ")[0-9a-f]{64}(")/) do |found|
-  "#{found[1]}#{checksums.fetch(required[:linux_x86_64])}#{found[2]}"
+required.each do |platform, filename|
+  updated = replace_once(updated, sha_after(filename)) do |found|
+    "#{found[1]}#{checksums.fetch(required.fetch(platform))}#{found[2]}"
+  end
 end
 
 if ARGV == ["--check"]
-  abort "Casks/reachpad.rb does not match #{tag}; run scripts/update-reachpad.rb" unless original == updated
+  abort "Formula/reachpad.rb does not match #{tag}; run scripts/update-reachpad.rb" unless original == updated
 
-  puts "Casks/reachpad.rb matches #{tag}"
+  puts "Formula/reachpad.rb matches #{tag}"
 elsif ARGV.empty?
-  File.write(CASK_PATH, updated) unless original == updated
-  puts original == updated ? "Casks/reachpad.rb already matches #{tag}" : "Updated Casks/reachpad.rb to #{tag}"
+  File.write(FORMULA_PATH, updated) unless original == updated
+  puts original == updated ? "Formula/reachpad.rb already matches #{tag}" : "Updated Formula/reachpad.rb to #{tag}"
 else
   abort "usage: scripts/update-reachpad.rb [--check]"
 end
