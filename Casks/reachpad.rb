@@ -2,16 +2,16 @@ cask "reachpad" do
   arch arm: "aarch64", intel: "x86_64"
   os macos: "apple-darwin", linux: "unknown-linux-musl"
 
-  version "0.1.1"
+  version "0.2.0"
 
   on_macos do
-    sha256 "adabc122ecd36d9c0b1b2d48b6888b059e963d73a57c3ef88d6171b1ac5766d2"
+    sha256 "e020a36f6a35cca9f2385447d65976cd4014ced833d495f640711f706ac92c50"
 
     depends_on arch: :arm64
   end
   on_linux do
-    sha256 arm64_linux:  "ea1397e827c85fd4a7ce3301ae3640b8250c549a0fa76f6aba196c39de30b308",
-           x86_64_linux: "1ca6e0280518ffa7d842500b2392e106b96d5b1ade6dabbb41fbad8c5f35d9e2"
+    sha256 arm64_linux:  "9733b5f2cb72b1c65a3ee37f69e65aca75841df4cc81876487c4b1b10abc8b1b",
+           x86_64_linux: "20a3b7e89f4b150b4b768f61707b2272fdf61cdd88f7ce2866fec5e263a005fa"
   end
 
   url "https://github.com/Reachpad/reachpad-cli/releases/download/cli-v#{version}/reachpad-#{arch}-#{os}.tar.gz"
