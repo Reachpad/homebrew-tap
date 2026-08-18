@@ -17,7 +17,7 @@ class Reachpad < Formula
   # updater rewrites the version, and it keeps the formula valid on platforms
   # that have no url — an Intel Mac then fails on the arm64 requirement below
   # with a sentence about architecture instead of a broken-formula error.
-  version "0.3.0"
+  version "0.4.0"
 
   livecheck do
     url :stable
@@ -38,17 +38,17 @@ class Reachpad < Formula
     depends_on arch: :arm64
 
     url "https://github.com/Reachpad/reachpad-cli/releases/download/cli-v#{version}/reachpad-aarch64-apple-darwin.tar.gz"
-    sha256 "e680481bfea70a7b7446341e9976167c3eac60294a89174e394372a760eed253"
+    sha256 "38eb3ff7c2753eea7a2a18a558f52c0b3163b59fca08cd26ee4cecbd54ac5e7f"
   end
 
   on_linux do
     on_arm do
       url "https://github.com/Reachpad/reachpad-cli/releases/download/cli-v#{version}/reachpad-aarch64-unknown-linux-musl.tar.gz"
-      sha256 "cd7ccce49947715b1acbecf5244b605084780068fa612bdd97fee34f52b6bf53"
+      sha256 "d8d49af932f6c127ff716a030844790f630c8b9749d74d940bb21a21356efc08"
     end
     on_intel do
       url "https://github.com/Reachpad/reachpad-cli/releases/download/cli-v#{version}/reachpad-x86_64-unknown-linux-musl.tar.gz"
-      sha256 "a4ef328e60b2235b90c26fcee39cf797423dd9b568197d81d70052d22498f2ad"
+      sha256 "003ed65c2b420988fbc5b31b9fe6cf77627460058623456625d044009e9efcd7"
     end
   end
 
