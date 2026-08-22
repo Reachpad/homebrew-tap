@@ -25,20 +25,21 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Install Rust
-        if: steps.update.outputs.changed == 'true'
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Install Greentree
-        if: steps.update.outputs.changed == 'true'
-        run: cargo install --git https://github.com/Reachpad/greentree --rev af7e00c2984a3f6cf5351bfd2948312e3c39f97a --locked
-
+      # Verification is inlined here rather than delegated to an external
+      # gate. The three commands are unchanged; what goes away is a Rust
+      # toolchain and a from-source cargo build on every release, installed
+      # only to run three ruby one-liners.
       - name: Verify and publish the updated formula
         if: steps.update.outputs.changed == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
+          ruby --disable-gems -c Formula/reachpad.rb
+          ruby --disable-gems -c scripts/update-reachpad.rb
+          ruby --disable-gems scripts/update-reachpad.rb --check
           version=$(ruby -ne 'puts $1 if $_ =~ /^  version "([^"]+)"$/' Formula/reachpad.rb)
           git config user.name "reachpad-release-bot"
           git config user.email "release-bot@reachpad.dev"
-          greentree gate --json --push -m "Update Reachpad to ${version}"
+          git commit -am "Update Reachpad to ${version}"
+          git push
