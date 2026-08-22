@@ -20,8 +20,8 @@ curl -fsSL https://reachpad.dev/install | sh
 ```
 
 The hourly workflow updates the formula from the latest `cli-v*` release and
-its published `SHA256SUMS` file. Greentree verifies the updated formula before
-the workflow publishes it.
+its published `SHA256SUMS` file. The workflow syntax-checks the formula and the
+updater, and runs the updater's own `--check`, before publishing.
 
 ## Upgrading from the cask
 
