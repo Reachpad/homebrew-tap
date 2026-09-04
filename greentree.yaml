@@ -1,0 +1,7 @@
+version: 1
+min_free_disk: 1G
+checks:
+  formula:
+    run: ruby --disable-gems -c Formula/reachpad.rb && ruby --disable-gems -c scripts/update-reachpad.rb && ruby --disable-gems -c scripts/update-reachpad.test.rb && ruby --disable-gems scripts/update-reachpad.test.rb && ruby --disable-gems scripts/update-reachpad.rb --check
+    required_for_publish: true
+    watch: true

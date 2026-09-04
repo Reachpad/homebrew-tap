@@ -10,36 +10,38 @@ permissions:
 
 concurrency:
   group: update-reachpad-formula
+  cancel-in-progress: false
 
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Read the latest Reachpad release
         id: update
         run: |
           ruby scripts/update-reachpad.rb
-          if test -n "$(git status --porcelain)"; then
+          if ! git diff --quiet -- Formula/reachpad.rb; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
       # Verification is inlined here rather than delegated to an external
-      # gate. The three commands are unchanged; what goes away is a Rust
-      # toolchain and a from-source cargo build on every release, installed
-      # only to run three ruby one-liners.
+      # gate. The checks stay dependency-free and exercise release provenance,
+      # redirects, checksum mapping and atomic replacement before publishing.
       - name: Verify and publish the updated formula
         if: steps.update.outputs.changed == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           ruby --disable-gems -c Formula/reachpad.rb
           ruby --disable-gems -c scripts/update-reachpad.rb
+          ruby --disable-gems -c scripts/update-reachpad.test.rb
+          ruby --disable-gems scripts/update-reachpad.test.rb
           ruby --disable-gems scripts/update-reachpad.rb --check
           version=$(ruby -ne 'puts $1 if $_ =~ /^  version "([^"]+)"$/' Formula/reachpad.rb)
           git config user.name "reachpad-release-bot"
           git config user.email "release-bot@reachpad.dev"
-          git commit -am "Update Reachpad to ${version}"
+          git add -- Formula/reachpad.rb
+          git commit -m "Update Reachpad to ${version}" -- Formula/reachpad.rb
           git push

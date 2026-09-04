@@ -1,6 +1,6 @@
 # Reachpad Homebrew tap
 
-Install the Reachpad CLI on Apple Silicon macOS or x86_64/ARM64 Linux:
+Install the Reachpad CLI on macOS or x86_64/ARM64 Linux:
 
 ```sh
 brew install reachpad/tap/reachpad
@@ -12,16 +12,15 @@ Homebrew installs the binary from the public
 verifies the archive checksum declared in the formula. Run `brew upgrade
 reachpad` to install a newer release.
 
-Intel macOS is not supported until Reachpad publishes an Intel macOS binary.
 Without Homebrew, install from the product-owned endpoint:
 
 ```sh
 curl -fsSL https://reachpad.dev/install | sh
 ```
 
-The hourly workflow updates the formula from the latest `cli-v*` release and
-its published `SHA256SUMS` file. The workflow syntax-checks the formula and the
-updater, and runs the updater's own `--check`, before publishing.
+The hourly workflow updates the formula from the latest `cli-v*` release. It
+ties every checksum to an exact release asset URL and cross-checks GitHub's
+asset digests against the published `SHA256SUMS` file before publishing.
 
 ## Upgrading from the cask
 
