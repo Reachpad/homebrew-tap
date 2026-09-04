@@ -12,33 +12,29 @@ class Reachpad < Formula
   desc "Run coding agents in durable cloud workspaces"
   homepage "https://reachpad.dev/docs/cli"
 
-  # `brew audit` calls this version redundant, because it can scan 0.2.0 out of
-  # the cli-v0.2.0 URLs. It is kept deliberately: it is the ONE place the
-  # updater rewrites the version, and it keeps the formula valid on platforms
-  # that have no url — an Intel Mac then fails on the arm64 requirement below
-  # with a sentence about architecture instead of a broken-formula error.
+  # `brew audit` calls this version redundant because it can scan the version
+  # out of the URLs. It is kept deliberately: the updater rewrites it once so
+  # all four interpolated platform URLs advance atomically and rollback checks
+  # have one canonical version anchor.
   version "0.4.5"
 
   livecheck do
     url :stable
-    regex(/^cli-v?(\d+(?:\.\d+)+)$/i)
+    regex(/^cli-v((?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*))+)$/i)
     strategy :github_latest do |json, regex|
       json["tag_name"]&.match(regex)&.[](1)
     end
   end
 
-  # The url/sha256 sit directly in `on_macos` instead of in a nested `on_arm`,
-  # and `brew audit` says so ("on_macos cannot include url"). That is deliberate
-  # while there is no Intel macOS binary: nesting them leaves an Intel Mac with
-  # a formula that has no url at all, which fails as "formula requires at least
-  # a URL", whereas this shape lets the arm64 requirement reject Intel with a
-  # sentence about architecture. Nest it under `on_arm` — and the audit note
-  # goes away — the day the release workflow publishes x86_64-apple-darwin.
   on_macos do
-    depends_on arch: :arm64
-
-    url "https://github.com/Reachpad/reachpad-cli/releases/download/cli-v#{version}/reachpad-aarch64-apple-darwin.tar.gz"
-    sha256 "b74c911494a7ab46024bce08a0b724379295e9a7fe89a55a1b5c82bf7598afe7"
+    on_arm do
+      url "https://github.com/Reachpad/reachpad-cli/releases/download/cli-v#{version}/reachpad-aarch64-apple-darwin.tar.gz"
+      sha256 "b74c911494a7ab46024bce08a0b724379295e9a7fe89a55a1b5c82bf7598afe7"
+    end
+    on_intel do
+      url "https://github.com/Reachpad/reachpad-cli/releases/download/cli-v#{version}/reachpad-x86_64-apple-darwin.tar.gz"
+      sha256 "d8011d69925991a6b5d759c2734da370c4565175b1f3f988e88be18754f1a916"
+    end
   end
 
   on_linux do
