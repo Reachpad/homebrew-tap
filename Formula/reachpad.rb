@@ -16,7 +16,7 @@ class Reachpad < Formula
   # out of the URLs. It is kept deliberately: the updater rewrites it once so
   # all four interpolated platform URLs advance atomically and rollback checks
   # have one canonical version anchor.
-  version "0.4.6"
+  version "0.5.0"
 
   livecheck do
     url :stable
@@ -29,22 +29,22 @@ class Reachpad < Formula
   on_macos do
     on_arm do
       url "https://github.com/Reachpad/reachpad-cli/releases/download/cli-v#{version}/reachpad-aarch64-apple-darwin.tar.gz"
-      sha256 "ce424a7e363771e6d191a46b33efa336b1acaa87c58edeaf94bb2fc2b6062ad1"
+      sha256 "cf21c450722212403cfbcfd4cde7f0c488440e6298f67fdb7b3c4c362c0bfd57"
     end
     on_intel do
       url "https://github.com/Reachpad/reachpad-cli/releases/download/cli-v#{version}/reachpad-x86_64-apple-darwin.tar.gz"
-      sha256 "d95917869f3fe463771a273d23a2cb686897bfc906825c591d8c80765f061690"
+      sha256 "99b22c997cb79a4416c469a572666be78e62626492b89dd8c2ed47568238c7f4"
     end
   end
 
   on_linux do
     on_arm do
       url "https://github.com/Reachpad/reachpad-cli/releases/download/cli-v#{version}/reachpad-aarch64-unknown-linux-musl.tar.gz"
-      sha256 "294493cc67d37b58dcab91ce9e15c98828dd8a742259fb415fe4e77a4d519bde"
+      sha256 "4a350d3ddbff622a4b548eea427017a96bd8f76459e36f2e648815e01c0199cb"
     end
     on_intel do
       url "https://github.com/Reachpad/reachpad-cli/releases/download/cli-v#{version}/reachpad-x86_64-unknown-linux-musl.tar.gz"
-      sha256 "3fa3fcf75ea6e302fdf4b75129df6e085e06bd1e55e7d3c2007a844261d0f4d6"
+      sha256 "f01ae78ec95739ba8a830b5ba7554e6877afb8694b123cde47c1554138a854ca"
     end
   end
 
